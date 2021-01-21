@@ -159,7 +159,7 @@ collections:
             
 
     - name: 'recipes'
-      label: 'recipes'
+      label: 'Recipes'
       description: 'Posts from all categories. Please check Workflow for all drafts'
       folder: 'content/recipes'
       create: true
