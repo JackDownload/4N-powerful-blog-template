@@ -156,6 +156,102 @@ collections:
                 required: false,
                 default: '',
             }
+            
+
+    - name: 'recipes'
+      label: 'recipes'
+      description: 'Posts from all categories. Please check Workflow for all drafts'
+      folder: 'content/recipes'
+      create: true
+      format: 'json'
+      slug: '{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}-{{second}}-{{slug}}'
+      preview_path: recipes/{{slug}}
+      editor:
+          preview: true
+      fields:
+          - {
+                label: 'Title',
+                name: 'title',
+                hint: 'Name of this post',
+                widget: 'string',
+            }
+          - {
+                label: 'Category',
+                name: 'category',
+                hint: 'Categories that this post belongs to',
+                widget: 'relation',
+                collection: 'categories',
+                searchFields: ['title'],
+                valueField: '{{slug}}',
+                display_fields: ['title'],
+                multiple: true,
+            }
+          - {
+                label: 'Jumbotron',
+                name: 'jumbotron',
+                hint: 'Large image on the top of this post',
+                widget: 'image',
+                required: false,
+                default: '',
+            }
+          - {
+                label: 'Icon',
+                name: 'icon',
+                hint: 'An image represents for this post',
+                widget: 'image',
+                required: false,
+                default: '',
+            }
+          - {
+                label: 'Author name',
+                name: 'author_name',
+                hint: 'Author name. If empty, your name will be used',
+                widget: 'string',
+                required: false,
+                default: '',
+            }
+          - {
+                label: 'Author avatar',
+                name: 'author_avatar',
+                hint: 'Author avatar. If empty, your avatar will be used',
+                widget: 'image',
+                required: false,
+                default: '',
+            }
+          - {
+                label: 'Publish Date',
+                name: 'date',
+                hint: 'Default is now',
+                widget: 'datetime',
+                date_format: 'DD.MM.YYYY',
+                time_format: 'HH:mm',
+                format: 'LLL',
+                picker_utc: false,
+                required: false,
+            }
+          - {
+                label: 'Description',
+                name: 'description',
+                hint: 'Short text describes your post',
+                widget: 'string',
+                required: false,
+                default: '',
+            }
+          - {
+                label: 'Tags',
+                name: 'tags',
+                hint: 'Use comma "," to seperate tags',
+                widget: 'list',
+                required: false,
+                default: [],
+            }
+          - {
+                label: 'Body',
+                name: 'body',
+                widget: 'markdown',
+                required: false,
+                default: '',
+            }
 
     - name: 'pages'
       label: 'Pages'
