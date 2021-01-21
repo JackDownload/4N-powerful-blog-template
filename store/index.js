@@ -245,22 +245,6 @@ export const actions = {
 		})
 		posts = posts.filter(post => post !== undefined)
 
-		let recipeIndexes = await require.context(
-			'~/content/recipes/',
-			false,
-			/\.json$/
-		)
-		let recipes = recipeIndexes.keys().map(key => {
-			let slug = key.slice(2, -5)
-			let recipe = recipeIndexes(key)
-			recipe.slug = slug
-			delete recipe.body
-
-			return recipe
-		})
-
-		recipes = recipes.filter(recipe => recipe !== undefined)
-
 		let categoryPosts = {}
 		categories.forEach(function (category) {
 			categoryPosts[category.slug] = posts.filter(post =>
@@ -273,29 +257,6 @@ export const actions = {
 		})
 
 		await commit('setCategoryPosts', categoryPosts)
-
-		let recipes = recipeIndexes.keys().map(key => {
-			let slug = key.slice(2, -5)
-			let recipe = recipeIndexes(key)
-			recipe.slug = slug
-			delete recipe.body
-
-			return recipe
-		})
-		recipes = recipes.filter(recipe => recipe !== undefined)
-
-		let categoryRecipes = {}
-		categories.forEach(function (category) {
-			categoryRecipes[category.slug] = recipes.filter(recipe =>
-				recipe.category.includes(category.slug)
-			)
-
-			categoryRecipes[category.slug].sort((a, b) =>
-				a.date < b.date ? 1 : b.date < a.date ? -1 : 0
-			)
-		})
-
-		await commit('setCategoryRecipes', categoryRecipes)
 
 		let taggedPosts = {}
 		posts.forEach(function (post) {
@@ -318,6 +279,32 @@ export const actions = {
 		}
 
 		await commit('setTaggedPosts', taggedPosts)
+		let recipeIndexes = await require.context(
+			'~/content/recipes/',
+			false,
+			/\.json$/
+		)
+
+		let recipes = recipeIndexes.keys().map(key => {
+			let slug = key.slice(2, -5)
+			let recipe = recipeIndexes(key)
+			recipe.slug = slug
+			delete recipe.body
+
+			return recipe
+		})
+		recipes = recipes.filter(recipe => recipe !== undefined)
+
+		let categoryRecipes = {}
+		categories.forEach(function (category) {
+			categoryRecipes[category.slug] = recipes.filter(recipe =>
+				recipe.category.includes(category.slug)
+			)
+
+			categoryRecipes[category.slug].sort((a, b) =>
+				a.date < b.date ? 1 : b.date < a.date ? -1 : 0
+			)
+		})
 
 		await commit('setCategoryRecipes', categoryRecipes)
 
