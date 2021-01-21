@@ -250,6 +250,16 @@ export const actions = {
 			false,
 			/\.json$/
 		)
+		let recipes = recipeIndexes.keys().map(key => {
+			let slug = key.slice(2, -5)
+			let recipe = recipeIndexes(key)
+			recipe.slug = slug
+			delete recipe.body
+
+			return recipe
+		})
+
+		recipes = recipes.filter(recipe => recipe !== undefined)
 
 		let categoryPosts = {}
 		categories.forEach(function (category) {
