@@ -109,34 +109,6 @@ export default {
 				}
 			})
 
-			categories.forEach(function (category) {
-				let categoryPosts = posts.filter(post =>
-					post.category.includes(category.slug)
-				)
-				if (Array.isArray(categoryPosts)) {
-					categoryPosts.forEach(function (post) {
-						routes.push({
-							route: '/' + category.slug + '/' + post.slug,
-							payload: require(`./content/posts/${post.fileName}`)
-						})
-					})
-				}
-			})
-
-			categories.forEach(function (category) {
-				let categoryRecipes = recipes.filter(recipe =>
-					recipe.category.includes(category.slug)
-				)
-				if (Array.isArray(categoryRecipes)) {
-					categoryRecipes.forEach(function (recipe) {
-						routes.push({
-							route: '/' + category.slug + '/' + recipe.slug,
-							payload: require(`./content/recipes/${recipe.fileName}`)
-						})
-					})
-				}
-			})
-
 			return routes
 		}
 	},
