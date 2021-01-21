@@ -32,7 +32,7 @@ export default {
 	image: {},
 
 	generate: {
-		routes: function() {
+		routes: function () {
 			let routes = []
 
 			const fs = require('fs')
@@ -60,7 +60,7 @@ export default {
 				post.fileName = file
 
 				if (post.tags) {
-					post.tags.forEach(function(tag) {
+					post.tags.forEach(function (tag) {
 						if (tags.indexOf(tag) == -1 && tag) {
 							tags.push(tag)
 						}
@@ -70,21 +70,68 @@ export default {
 				return post
 			})
 
-			tags.forEach(function(tag) {
+			let recipes = fs.readdirSync('./content/recipes').map(file => {
+				let slug = file.slice(0, -5)
+				let content = fs.readFileSync('./content/recipes/' + file, 'utf8')
+				let recipe = JSON.parse(content)
+				delete recipe.body
+				recipe.slug = slug
+				recipe.fileName = file
+
+				if (recipe.tags) {
+					recipe.tags.forEach(function (tag) {
+						if (tags.indexOf(tag) == -1 && tag) {
+							tags.push(tag)
+						}
+					})
+				}
+
+				return recipe
+			})
+
+			tags.forEach(function (tag) {
 				routes.push({
 					route: '/' + tag
 				})
 			})
 
-			categories.forEach(function(category) {
+			categories.forEach(function (category) {
 				let categoryPosts = posts.filter(post =>
 					post.category.includes(category.slug)
 				)
 				if (Array.isArray(categoryPosts)) {
-					categoryPosts.forEach(function(post) {
+					categoryPosts.forEach(function (post) {
 						routes.push({
 							route: '/' + category.slug + '/' + post.slug,
 							payload: require(`./content/posts/${post.fileName}`)
+						})
+					})
+				}
+			})
+
+			categories.forEach(function (category) {
+				let categoryPosts = posts.filter(post =>
+					post.category.includes(category.slug)
+				)
+				if (Array.isArray(categoryPosts)) {
+					categoryPosts.forEach(function (post) {
+						routes.push({
+							route: '/' + category.slug + '/' + post.slug,
+							payload: require(`./content/posts/${post.fileName}`)
+						})
+					})
+				}
+			})
+
+			categories.forEach(function (category) {
+				let categoryRecipes = recipes.filter(recipe =>
+					recipe.category.includes(category.slug)
+				)
+				if (Array.isArray(categoryRecipes)) {
+					categoryRecipes.forEach(function (recipe) {
+						routes.push({
+							route: '/' + category.slug + '/' + recipe.slug,
+							payload: require(`./content/recipes/${recipe.fileName}`)
 						})
 					})
 				}
@@ -146,7 +193,7 @@ export default {
 		/*
 		 ** You can extend webpack config here
 		 */
-		extend(config, ctx) {}
+		extend(config, ctx) { }
 	},
 
 	/**

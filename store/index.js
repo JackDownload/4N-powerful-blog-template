@@ -6,6 +6,8 @@ Vue.use(Vuex)
 export const state = () => ({
 	navigations: null,
 	posts: null,
+	recipes: null,
+	taggedRecipes: null,
 	taggedPosts: null,
 
 	WEBSITE_NAME: 'Your website name',
@@ -78,6 +80,14 @@ export const mutations = {
 		state.taggedPosts = list
 	},
 
+	setCategoryRecipes(state, list) {
+		state.recipes = list
+	},
+
+	setTaggedRecipes(state, list) {
+		state.taggedRecipes = list
+	},
+
 	setShowSideBar(state, value) {
 		state.showSideBar = value
 	}
@@ -129,7 +139,7 @@ export const actions = {
 			Array.isArray(navigationBarSetting.categories.list) &&
 			navigationBarSetting.categories.list.length
 		) {
-			navigationBarSetting.categories.list.forEach(function(entry) {
+			navigationBarSetting.categories.list.forEach(function (entry) {
 				let filteredItems = categories.filter(
 					category => category.slug == entry
 				)
@@ -185,7 +195,7 @@ export const actions = {
 			Array.isArray(navigationBarSetting.pages.list) &&
 			navigationBarSetting.pages.list.length
 		) {
-			navigationBarSetting.pages.list.forEach(function(entry) {
+			navigationBarSetting.pages.list.forEach(function (entry) {
 				let filteredItems = pages.filter(page => page.slug == entry)
 				if (filteredItems[0]) {
 					pageNavigations.push(filteredItems[0])
@@ -235,8 +245,14 @@ export const actions = {
 		})
 		posts = posts.filter(post => post !== undefined)
 
+		let recipeIndexes = await require.context(
+			'~/content/recipes/',
+			false,
+			/\.json$/
+		)
+
 		let categoryPosts = {}
-		categories.forEach(function(category) {
+		categories.forEach(function (category) {
 			categoryPosts[category.slug] = posts.filter(post =>
 				post.category.includes(category.slug)
 			)
@@ -248,10 +264,33 @@ export const actions = {
 
 		await commit('setCategoryPosts', categoryPosts)
 
+		let recipes = recipeIndexes.keys().map(key => {
+			let slug = key.slice(2, -5)
+			let recipe = recipeIndexes(key)
+			recipe.slug = slug
+			delete recipe.body
+
+			return recipe
+		})
+		recipes = recipes.filter(recipe => recipe !== undefined)
+
+		let categoryRecipes = {}
+		categories.forEach(function (category) {
+			categoryRecipes[category.slug] = recipes.filter(recipe =>
+				recipe.category.includes(category.slug)
+			)
+
+			categoryRecipes[category.slug].sort((a, b) =>
+				a.date < b.date ? 1 : b.date < a.date ? -1 : 0
+			)
+		})
+
+		await commit('setCategoryRecipes', categoryRecipes)
+
 		let taggedPosts = {}
-		posts.forEach(function(post) {
+		posts.forEach(function (post) {
 			if (post.tags !== undefined) {
-				post.tags.forEach(function(tag) {
+				post.tags.forEach(function (tag) {
 					if (tag) {
 						if (taggedPosts[tag] === undefined) {
 							taggedPosts[tag] = []
@@ -269,6 +308,30 @@ export const actions = {
 		}
 
 		await commit('setTaggedPosts', taggedPosts)
+
+		await commit('setCategoryRecipes', categoryRecipes)
+
+		let taggedRecipes = {}
+		recipes.forEach(function (recipe) {
+			if (recipe.tags !== undefined) {
+				recipe.tags.forEach(function (tag) {
+					if (tag) {
+						if (taggedRecipes[tag] === undefined) {
+							taggedRecipes[tag] = []
+						}
+						taggedRecipes[tag].push(recipe)
+					}
+				})
+			}
+		})
+
+		for (let tag in taggedRecipes) {
+			taggedRecipes[tag].sort((a, b) =>
+				a.date < b.date ? 1 : b.date < a.date ? -1 : 0
+			)
+		}
+
+		await commit('setTaggedRecipes', taggedRecipes)
 	},
 
 	async toggleSideBar({ commit }) {
